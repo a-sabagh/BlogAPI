@@ -25,6 +25,7 @@ class Post
         extract($parsms);
         $this->id = $id;
         $this->name = $name;
+        $this->content = $content;
         $this->categoryId = $category_id;
         $this->categoryName = $category_name;
         $this->author = $author;
@@ -108,7 +109,7 @@ class Post
     public static function all()
     {
         $database = new Database;
-        $connection = $connection->connect();
+        $connection = $database->connect();
         $query = 'SELECT
             p.id,
             p.name,
@@ -116,7 +117,7 @@ class Post
             p.content,
             p.category_id,
             c.name as category_name
-        FROM ' . $this->table . ' p
+        FROM ' . Post::$table . ' p
         LEFT JOIN categories c ON p.category_id = c.id';
         $result = $connection->query($query);
         if ($result) {
@@ -136,8 +137,8 @@ class Post
      */
     public static function find($id)
     {
-        $connection = new Database;
-        $connection = $connection->connect();
+        $database = new Database;
+        $connection = $database->connect();
         $query = 'SELECT
             p.id,
             p.name,
@@ -166,7 +167,7 @@ class Post
     {
         $database = new Database;
         $connection = $database->connect();
-        $query = 'UPDATE ' . $this->table . ' SET
+        $query = 'UPDATE ' . Post::$table . ' SET
             name = :name,
             author = :author,
             content = :content,
@@ -194,7 +195,7 @@ class Post
     {
         $database = new Database;
         $connection = $database->connect();
-        $query = 'DELETE FROM ' . $this->table . ' WHERE id = :id';
+        $query = 'DELETE FROM ' . Post::$table . ' WHERE id = :id';
         $stmt = $connection->prepare($query);
         $stmt->bindParam(":id", $this->id);
         $result = $stmt->execute();
