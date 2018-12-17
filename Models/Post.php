@@ -1,60 +1,131 @@
 <?php
+
 class Post
 {
     /**
-     * connection
-     */
-    public $connection;
-
-    /**
      * table
      */
-    public $table = 'posts';
+    public static $table = 'posts';
 
     /**
      * attributes
      */
     public $id;
     public $name;
-    public $content;
     public $categoryId;
     public $categoryName;
-    public $cotent;
+    public $content;
     public $author;
 
     /**
      * constructor
      */
-    public function __construct($connection)
+    public function __construct($parsms)
     {
-        $this->connection = $connection;
+        extract($parsms);
+        $this->id = $id;
+        $this->name = $name;
+        $this->categoryId = $category_id;
+        $this->categoryName = $category_name;
+        $this->author = $author;
+    }
+
+    /**
+     * return collection of object
+     */
+    private static function collection($params)
+    {
+        return new Post($params);
     }
 
     /**
      * create new post
      */
-    public function create()
+    public static function create($params)
     {
+        $database = new Database;
+        $connection = $database->connect();
+        extract($params);
+        $query = 'INSERT INTO ' . Post::$table . '(
+                name,
+                author,
+                content,
+                category_id
+            )VALUES(
+                :name,
+                :author,
+                :content,
+                :category_id
+            )';
+        $stmt = $connection->prepare($query);
+        $stmt->bindParam(":name",$name);
+        $stmt->bindParam(":author",$author);
+        $stmt->bindParam(":content",$content);
+        $stmt->bindParam(":category_id",$category_id);
+        $result = $stmt->execute();
+        if($result){
+            return $connection->lastInsertId();
+        }else{
+            return false;
+        }
 
+    }
+
+    /**
+     * save post object
+     */
+    public function save()
+    {
+        $database = new Database;
+        $connection = $database->connect();
+        $query = 'INSERT INTO  ' . Post::$table . '(
+                name,
+                author,
+                content,
+                category_id
+            )VALUES(
+                :name,
+                :author,
+                :content,
+                :category_id
+            )';
+        $stmt = $connection->prepare($query);
+        $stmt->bindParam(":name",$this->name);
+        $stmt->bindParam(":author",$this->author);
+        $stmt->bindParam(":content",$this->content);
+        $stmt->bindParam(":category_id",$this->category_id);
+        $result = $stmt->execute();
+        if($result){
+            return $connection->lastInsertId();
+        }else{
+            return false;
+        }
     }
 
     /**
      * get all posts
      */
-    public function all()
+    public static function all()
     {
+        $database = new Database;
+        $connection = $connection->connect();
         $query = 'SELECT
             p.id,
             p.name,
             p.author,
             p.content,
             p.category_id,
-            c.name as category
+            c.name as category_name
         FROM ' . $this->table . ' p
         LEFT JOIN categories c ON p.category_id = c.id';
-        $result = $this->connection->query($query);
+        $result = $connection->query($query);
         if ($result) {
-            return $result->fetchAll(PDO::FETCH_ASSOC);
+            $posts = $result->fetchAll(PDO::FETCH_ASSOC);
+            $resultObjects = [];
+            foreach($posts as $post){
+                $resultObjects[] = Post::collection($post);
+            }
+            return $resultObjects;
         } else {
             return false;
         }
@@ -63,24 +134,74 @@ class Post
     /**
      * find post by id
      */
-    public function find($id)
+    public static function find($id)
     {
-
+        $connection = new Database;
+        $connection = $connection->connect();
+        $query = 'SELECT
+            p.id,
+            p.name,
+            p.author,
+            p.content,
+            p.category_id,
+            c.name as category_name
+        FROM ' . Post::$table . ' p
+        LEFT JOIN categories c ON p.category_id = c.id
+        WHERE p.id=:id';
+        $stmt = $connection->prepare($query);
+        $stmt->bindParam(":id", $id);
+        $result = $stmt->execute();
+        if ($result) {
+            $post = $stmt->fetch(PDO::FETCH_ASSOC);
+            return Post::collection($post);
+        } else {
+            return false;
+        }
     }
 
     /**
      * update post by id
      */
-    public function update($id)
+    public function update($params)
     {
-
+        $database = new Database;
+        $connection = $database->connect();
+        $query = 'UPDATE ' . $this->table . ' SET
+            name = :name,
+            author = :author,
+            content = :content,
+            category_id = :category_id
+        WHERE id = :id';
+        $stmt = $connection->prepare($query);
+        extract($params);
+        $stmt->bindParam(":name", $name);
+        $stmt->bindParam(":author", $author);
+        $stmt->bindParam(":content", $content);
+        $stmt->bindParam(":category_id", $category_id);
+        $stmt->bindParam(":id", $this->id);
+        $result = $stmt->execute();
+        if ($result) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
      * delete post
      */
-    public function delete($id)
+    public function delete()
     {
-
+        $database = new Database;
+        $connection = $database->connect();
+        $query = 'DELETE FROM ' . $this->table . ' WHERE id = :id';
+        $stmt = $connection->prepare($query);
+        $stmt->bindParam(":id", $this->id);
+        $result = $stmt->execute();
+        if ($result) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
