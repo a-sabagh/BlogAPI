@@ -22,7 +22,9 @@ Simple Rest API for Blog Website with Post and Category Resources. using PDO for
 <ul>
   <li><code>api/posts/all.php</li></code>
   <li><code>api/posts/create.php</li></code>
-  <li><code>api/posts/single.php?id=x</li></code>
-  <li><code>api/posts/update.php?id=x</li></code>
-  <li><code>api/posts/delete.php?id=x</li></code>
+  <li><code>api/posts/single.php</li></code>
+  <li><code>api/posts/update.php</li></code>
+  <li><code>api/posts/delete.php</li></code>
 </ul>
+<h2>Basic Authentication</h2>
+<p>using basic authentication and show simple message to find out authenticate or not</p>
