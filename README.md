@@ -27,4 +27,7 @@ Simple Rest API for Blog Website with Post and Category Resources. using PDO for
   <li><code>api/posts/delete.php</li></code>
 </ul>
 <h2>Basic Authentication</h2>
-<p>using basic authentication and show simple message to find out authenticate or not</p>
+<ul>
+  <li>Http Basic authentication and show simple message to find out authenticate or not using JSON Entity Body</li>
+  <li>Http Basic authentication for Browser Client</li>
+</ul>
